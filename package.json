@@ -10,9 +10,11 @@
     "code-push",
     "cordova",
     "react-native",
-    "live",
-    "update"
+    "liveupdate"
   ],
   "author": "Chao Wang",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "walk": "^2.3.9"
+  }
 }
