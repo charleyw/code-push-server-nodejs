@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>登录</title>
+    <link rel="stylesheet" href="/stylesheets/normalize.css">
+    <link rel="stylesheet" href="/stylesheets/skeleton.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+  </head>
+  <body>
+    <h1>登录</h1>
+    <form action="/auth/login" method="POST">
+      <% if(locals.error) { %>
+      <div class="error">
+        <%= error %>
+      </div>
+      <% } %>
+      <div>
+        <label for="email">邮件</label>
+        <input id="email" type="email" name="email" required="required" />
+      </div>
+      <div>
+        <label for="password">密码</label>
+        <input id="password" type="password" name="password" required="required" />
+      </div>
+      <div>
+        <input type="submit" class="button-primary" value="登录" />
+      </div>
+    </form>
+  </body>
+</html>

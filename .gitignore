@@ -1,3 +1,10 @@
 .idea
 node_modules
 tmp
+start.sh
+.avoscloud
+.leancloud
+
+# VIM
+*~
+*.swp
