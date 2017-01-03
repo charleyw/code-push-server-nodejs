@@ -26,7 +26,7 @@ class Deployment extends AV.Object {
     const query = new AV.Query(FullPackage);
     query.equalTo('deployment', this);
     query.descending('createdAt');
-    query.include('deployment');
+    query.include('user');
     return query.first();
   }
 }

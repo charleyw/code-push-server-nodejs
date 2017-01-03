@@ -6,7 +6,7 @@ const unzip = require('unzip2');
 const router = require('express').Router({mergeParams: true});
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
-const App = require('../models/app');
+const User = require('../models/user');
 const AppPacker = require('../app-packer');
 const Deployment = require('../models/deployment');
 const FullPackage = require('../models/full-package');
@@ -26,7 +26,7 @@ router.get('/', function (req, res, next) {
               appVersion: fps[i].get('appVersion'),
               uploadTime: fps[i].get('createdAt'),
               isMandatory: fps[i].get('isMandatory'),
-              releasedBy: 'chao',
+              releasedBy: fps[i].get('user').get('email'),
               description: fps[i].get('description')
             }
           }
@@ -50,7 +50,7 @@ const generateManifest = options => new Promise((resolve, reject) => {
   new AppPacker().generateManifest(options.baseDir).then(manifest => resolve(Object.assign({}, options, {manifest})))
 });
 
-const deploymentFullPackage = (packageInfo, deployment) => options => new Promise((resolve, reject) => {
+const deploymentFullPackage = (packageInfo, deployment, user) => options => new Promise((resolve, reject) => {
   const fullPackageFile = fs.readFileSync(options.originalFilePath);
 
   new AV.File(options.originalFileName, {base64: new Buffer(fullPackageFile).toString('base64')}).save().then(file => {
@@ -61,6 +61,7 @@ const deploymentFullPackage = (packageInfo, deployment) => options => new Promis
     fullPackage.set('isMandatory', packageInfo.isMandatory);
     fullPackage.set('manifest', JSON.stringify(options.manifest));
     fullPackage.set('deployment', deployment);
+    fullPackage.set('user', user);
     fullPackage.set('url', file.url());
     fullPackage.save().then(savedFullPackage =>
       resolve(Object.assign({}, options, {packageInfo, fullPackage: savedFullPackage}))
@@ -76,7 +77,7 @@ router.post('/:deploymentName/release', multipartMiddleware, function (req, res,
       if (deployments.length) {
         unzipPackage(req.files.package.path, req.files.package.name)
           .then(generateManifest)
-          .then(deploymentFullPackage(JSON.parse(req.body.packageInfo), deployments[0]))
+          .then(deploymentFullPackage(JSON.parse(req.body.packageInfo), deployments[0], AV.Object.createWithoutData('User', req.user.id)))
           .then(result => res.json({ok: true}))
       } else {
         res.json({error: 'no deployment found'})
