@@ -13,20 +13,30 @@ const FullPackage = require('../models/full-package');
 
 router.get('/', function (req, res, next) {
   Deployment.find_by_app_name(req.params.appName).then(ds => {
-    res.json({
-      deployments: ds.map(d => ({
-        name: d.get('name'),
-        key: d.get('id'),
-        package: {
-          label: '123',
-          appVersion: '123',
-          uploadTime: new Date(),
-          isMandatory: false,
-          releasedBy: 'chao',
-          description: 'asdfsdfasdf'
-        }
-      }))
-    })
+    Promise.all(ds.map(d => d.latest_full_package())).then(fps => {
+      const resp = {
+        deployments: ds.map((d, i) => {
+          let results = {
+            name: d.get('name'),
+            key: d.get('id')
+          };
+          if (fps[i]) {
+            results.package = {
+              label: fps[i].get('id'),
+              appVersion: fps[i].get('appVersion'),
+              uploadTime: fps[i].get('createdAt'),
+              isMandatory: fps[i].get('isMandatory'),
+              releasedBy: 'chao',
+              description: fps[i].get('description')
+            }
+          }
+
+          return results;
+        })
+      };
+
+      res.json(resp)
+    });
   })
 });
 
@@ -72,6 +82,10 @@ router.post('/:deploymentName/release', multipartMiddleware, function (req, res,
         res.json({error: 'no deployment found'})
       }
     });
+});
+
+router.get('/:depoymentName/metrics', function (req, res, next) {
+  res.json({metrics: {}})
 });
 
 module.exports = router;

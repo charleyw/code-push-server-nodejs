@@ -1,5 +1,6 @@
 const AV = require('leanengine');
 const App = require('./app');
+const FullPackage = require('./full-package');
 
 class Deployment extends AV.Object {
   static find_by_app_name(name) {
@@ -19,6 +20,14 @@ class Deployment extends AV.Object {
     query.equalTo('name', deploymentName);
 
     return query.find();
+  }
+
+  latest_full_package() {
+    const query = new AV.Query(FullPackage);
+    query.equalTo('deployment', this);
+    query.descending('createdAt');
+    query.include('deployment');
+    return query.first();
   }
 }
 module.exports = Deployment;
