@@ -76,7 +76,7 @@ router.post('/:deploymentName/release', multipartMiddleware, function (req, res,
       if (deployments.length) {
         unzipPackage(req.files.package.path, req.files.package.name)
           .then(generateManifest)
-          .then(deploymentFullPackage(req.body.packageInfo, deployments[0]))
+          .then(deploymentFullPackage(JSON.parse(req.body.packageInfo), deployments[0]))
           .then(result => res.json({ok: true}))
       } else {
         res.json({error: 'no deployment found'})
