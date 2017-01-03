@@ -10,5 +10,15 @@ class Deployment extends AV.Object {
 
     return query.find();
   }
+
+  static find_by(appName, deploymentName) {
+    const innerQuery = new AV.Query(App);
+    innerQuery.equalTo('name', appName);
+    const query = new AV.Query(Deployment);
+    query.matchesQuery('app', innerQuery);
+    query.equalTo('name', deploymentName);
+
+    return query.find();
+  }
 }
 module.exports = Deployment;
