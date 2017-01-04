@@ -24,7 +24,9 @@ class AppPacker {
           version: crypto.createHash('sha256').update(JSON.stringify(Object.keys(fileHashes).map(k => `${k}:${fileHashes[k]}`, []).sort())).digest('hex')
         };
         resolve(manifest)
-      })
+      });
+
+      walker.on('error', err => reject(err))
     })
   }
 

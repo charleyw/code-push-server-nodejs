@@ -43,7 +43,8 @@ router.get('/', function (req, res, next) {
 const unzipPackage = (zipFilePath, zipName) => new Promise((resolve, reject) => {
   const localPackagePath = `${os.tmpdir()}/${zipName}.unzipped`;
   fs.createReadStream(zipFilePath).pipe(unzip.Extract({path: localPackagePath}))
-    .on('close', () => resolve({baseDir: localPackagePath, originalFilePath: zipFilePath, originalFileName: zipName}));
+    .on('close', () => resolve({baseDir: localPackagePath, originalFilePath: zipFilePath, originalFileName: zipName}))
+    .on('error', reject);
 });
 
 const generateManifest = options => new Promise((resolve, reject) => {
@@ -67,7 +68,7 @@ const deploymentFullPackage = (packageInfo, deployment, user) => options => new 
       resolve(Object.assign({}, options, {packageInfo, fullPackage: savedFullPackage}))
     ).catch(err => console.log('error: ', err));
   }).catch(err => {
-    throw err;
+    reject(err);
   })
 });
 
@@ -78,11 +79,15 @@ router.post('/:deploymentName/release', multipartMiddleware, function (req, res,
         unzipPackage(req.files.package.path, req.files.package.name)
           .then(generateManifest)
           .then(deploymentFullPackage(JSON.parse(req.body.packageInfo), deployments[0], AV.Object.createWithoutData('User', req.user.id)))
-          .then(result => res.json({ok: true}))
+          .then(result => res.json({ok: true})).catch(err => {
+            throw err
+        })
       } else {
         res.json({error: 'no deployment found'})
       }
-    });
+    }).catch(err => {
+      throw err;
+  });
 });
 
 router.get('/:depoymentName/metrics', function (req, res, next) {

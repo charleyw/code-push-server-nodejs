@@ -7,7 +7,7 @@ class Deployment extends AV.Object {
   static byAppNameAndUserId(name, userId) {
     const innerQuery = new AV.Query(App);
     innerQuery.equalTo('name', name);
-    innerQuery.equalTo('user', User.createWithoutData(userId));
+    innerQuery.matchesQuery('user', AV.Object.createWithoutData('User', userId));
     const query = new AV.Query(Deployment);
     query.matchesQuery('app', innerQuery);
 
@@ -17,7 +17,7 @@ class Deployment extends AV.Object {
   static findBy(appName, deploymentName, userId) {
     const innerQuery = new AV.Query(App);
     innerQuery.equalTo('name', appName);
-    innerQuery.equalTo('user', User.createWithoutData(userId));
+    innerQuery.matchesQuery('user', AV.Object.createWithoutData('User', userId));
     const query = new AV.Query(Deployment);
     query.matchesQuery('app', innerQuery);
     query.equalTo('name', deploymentName);
