@@ -8,7 +8,7 @@ var morgan = require('morgan');
 var jwt = require('express-jwt');
 var auth = require('./routes/auth');
 var apps = require('./routes/apps');
-var updateCheck = require('./routes/updateCheck');
+var updateCheck = require('./routes/update-check');
 require('./models/index');
 var AV = require('leanengine');
 
