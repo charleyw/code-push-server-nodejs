@@ -16,7 +16,6 @@ router.post('/download', function (req, res, next) {
 });
 
 router.post('/deploy', function(req, res, next) {
-  console.log(req.body)
   // { appVersion: '0.0.1',
   //   deploymentKey: '586c52e3128fe1005832a277',
   //   clientUniqueId: '721348A1-2FF0-405F-BF75-AA02AC3C2B37',
