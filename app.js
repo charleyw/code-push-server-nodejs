@@ -9,6 +9,7 @@ var jwt = require('express-jwt');
 var auth = require('./routes/auth');
 var apps = require('./routes/apps');
 var updateCheck = require('./routes/update-check');
+var reportStatus = require('./routes/report-status');
 require('./models/index');
 var AV = require('leanengine');
 
@@ -32,7 +33,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(morgan('combined'));
 
-app.use(jwt({ secret: 'shhhhhhared-secret'}).unless({path: ['/auth/register', '/auth/login', '/updateCheck']}));
+app.use(jwt({ secret: 'shhhhhhared-secret'}).unless({path: ['/auth/register', '/auth/login', '/updateCheck', '/reportStatus/download', '/reportStatus/deploy']}));
 app.get('/', function(req, res) {
   res.render('index', { currentTime: new Date() });
 });
@@ -45,6 +46,7 @@ app.get('/authenticated', function(req, res) {
 app.use('/auth', auth);
 app.use('/apps', apps);
 app.use('/updateCheck', updateCheck);
+app.use('/reportStatus', reportStatus);
 
 app.use(function(req, res, next) {
   // 如果任何一个路由都没有返回响应，则抛出一个 404 异常给后续的异常处理器
