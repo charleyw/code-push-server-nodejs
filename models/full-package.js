@@ -7,7 +7,6 @@ class FullPackage extends AV.Object {
     query.matchesQuery('deployment', AV.Object.createWithoutData('Deployment', deploymentKey));
     query.equalTo('appVersion', appVersion || '');
     query.descending('createdAt');
-    console.log(query)
     return query.first();
   }
 }
