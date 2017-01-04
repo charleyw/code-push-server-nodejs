@@ -53,23 +53,28 @@ const generateManifest = options => new Promise((resolve, reject) => {
 
 const deploymentFullPackage = (packageInfo, deployment, user) => options => new Promise((resolve, reject) => {
   const fullPackageFile = fs.readFileSync(options.originalFilePath);
-
-  new AV.File(options.originalFileName, {base64: new Buffer(fullPackageFile).toString('base64')}).save().then(file => {
-    const fullPackage = new FullPackage();
-    fullPackage.set('appVersion', packageInfo.appVersion);
-    fullPackage.set('description', packageInfo.description);
-    fullPackage.set('packageHash', options.manifest.version);
-    fullPackage.set('isMandatory', packageInfo.isMandatory);
-    fullPackage.set('manifest', JSON.stringify(options.manifest));
-    fullPackage.set('deployment', deployment);
-    fullPackage.set('user', user);
-    fullPackage.set('url', file.url());
-    fullPackage.save().then(savedFullPackage =>
-      resolve(Object.assign({}, options, {packageInfo, fullPackage: savedFullPackage}))
-    ).catch(err => console.log('error: ', err));
-  }).catch(err => {
-    reject(err);
-  })
+  deployment.findByPackageHash(options.manifest.version).then(existPackage => {
+    if(existPackage){
+      resolve(existPackage)
+    } else {
+      new AV.File(options.originalFileName, {base64: new Buffer(fullPackageFile).toString('base64')}).save().then(file => {
+        const fullPackage = new FullPackage();
+        fullPackage.set('appVersion', packageInfo.appVersion);
+        fullPackage.set('description', packageInfo.description);
+        fullPackage.set('packageHash', options.manifest.version);
+        fullPackage.set('isMandatory', packageInfo.isMandatory);
+        fullPackage.set('manifest', JSON.stringify(options.manifest));
+        fullPackage.set('deployment', deployment);
+        fullPackage.set('user', user);
+        fullPackage.set('url', file.url());
+        fullPackage.save().then(savedFullPackage =>
+          resolve(Object.assign({}, options, {packageInfo, fullPackage: savedFullPackage}))
+        ).catch(err => console.log('error: ', err));
+      }).catch(err => {
+        reject(err);
+      })
+    }
+  });
 });
 
 router.post('/:deploymentName/release', multipartMiddleware, function (req, res, next) {

@@ -32,5 +32,12 @@ class Deployment extends AV.Object {
     query.include('user');
     return query.first();
   }
+
+  findByPackageHash(packageHash) {
+    const query = new AV.Query(FullPackage);
+    query.equalTo('deployment', this);
+    query.equalTo('packageHash', packageHash);
+    return query.first();
+  }
 }
 module.exports = Deployment;
