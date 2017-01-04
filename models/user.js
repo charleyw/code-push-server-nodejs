@@ -7,6 +7,10 @@ class User extends AV.User {
     return query.get(id);
   }
 
+  static createWithoutData(id) {
+    return AV.Object.createWithoutData('User', id)
+  }
+
   apps() {
     const query = new AV.Query(App);
     query.equalTo('user', this);

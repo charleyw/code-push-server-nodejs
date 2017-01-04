@@ -1,20 +1,23 @@
 const AV = require('leanengine');
 const App = require('./app');
+const User = require('./user');
 const FullPackage = require('./full-package');
 
 class Deployment extends AV.Object {
-  static find_by_app_name(name) {
+  static byAppNameAndUserId(name, userId) {
     const innerQuery = new AV.Query(App);
     innerQuery.equalTo('name', name);
+    innerQuery.equalTo('user', User.createWithoutData(userId));
     const query = new AV.Query(Deployment);
     query.matchesQuery('app', innerQuery);
 
     return query.find();
   }
 
-  static find_by(appName, deploymentName) {
+  static findBy(appName, deploymentName, userId) {
     const innerQuery = new AV.Query(App);
     innerQuery.equalTo('name', appName);
+    innerQuery.equalTo('user', User.createWithoutData(userId));
     const query = new AV.Query(Deployment);
     query.matchesQuery('app', innerQuery);
     query.equalTo('name', deploymentName);

@@ -12,7 +12,7 @@ const Deployment = require('../models/deployment');
 const FullPackage = require('../models/full-package');
 
 router.get('/', function (req, res, next) {
-  Deployment.find_by_app_name(req.params.appName).then(ds => {
+  Deployment.byAppNameAndUserId(req.params.appName, req.user.id).then(ds => {
     Promise.all(ds.map(d => d.latest_full_package())).then(fps => {
       const resp = {
         deployments: ds.map((d, i) => {
@@ -72,7 +72,7 @@ const deploymentFullPackage = (packageInfo, deployment, user) => options => new 
 });
 
 router.post('/:deploymentName/release', multipartMiddleware, function (req, res, next) {
-  Deployment.find_by(req.params.appName, req.params.deploymentName)
+  Deployment.findBy(req.params.appName, req.params.deploymentName)
     .then(deployments => {
       if (deployments.length) {
         unzipPackage(req.files.package.path, req.files.package.name)
