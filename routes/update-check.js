@@ -9,7 +9,7 @@ router.get('/', function (req, res, next) {
   Device.findOrCreateBy(req.query.clientUniqueId).then(() => {
     return FullPackage.findLatestBy(req.query.deploymentKey, req.query.appVersion)
       .then(p => {
-        if (p) {
+        if (p && p.get('packageHash') !== req.query.packageHash) {
           res.json({
             updateInfo: {
               description: p.get('description'),
