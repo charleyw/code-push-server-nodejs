@@ -78,6 +78,7 @@ const deploymentFullPackage = (packageInfo, deployment, user) => options => new 
 });
 
 router.post('/:deploymentName/release', multipartMiddleware, function (req, res, next) {
+  console.log('Received package file: ', req.files);
   Deployment.findBy(req.params.appName, req.params.deploymentName)
     .then(deployments => {
       if (deployments.length) {
@@ -85,6 +86,7 @@ router.post('/:deploymentName/release', multipartMiddleware, function (req, res,
           .then(generateManifest)
           .then(deploymentFullPackage(JSON.parse(req.body.packageInfo), deployments[0], AV.Object.createWithoutData('User', req.user.id)))
           .then(result => res.json({ok: true})).catch(err => {
+            console.log('Error when deploy full package to lean cloud ', req.files);
             throw err
         })
       } else {
