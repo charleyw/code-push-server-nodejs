@@ -1,5 +1,6 @@
 'use strict';
 var express = require('express');
+var cors = require('cors')
 var timeout = require('connect-timeout');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -14,6 +15,10 @@ require('./models/index');
 var AV = require('leanengine');
 
 var app = express();
+app.options('*', cors({
+  origin: /.*/,
+  methods: ['GET', 'PUT', 'POST']
+}))
 
 // 设置模板引擎
 app.set('views', path.join(__dirname, 'views'));
